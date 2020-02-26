@@ -119,7 +119,27 @@ public class RBTree<T extends Comparable<T>> {
     private RBTreeNode<T> rightOf(RBTreeNode<T> node) {
         return node == null ? null : node.right;
     }
+
+    /**
+     * 关于节点的key
+     *
+     * @param node RBTNode
+     * @return key
+     */
+    private T keyOf(RBTreeNode<T> node) {
+        return node == null ? null : node.key;
+    }
     //--以上设计这些方法避免大量的空指针判断
+
+    /**
+     * 获取最小的key
+     *
+     * @return 最小key
+     */
+    public final T getFirstKey() {
+        RBTreeNode<T> node = getFirstNode();
+        return keyOf(node);
+    }
 
     /**
      * 获取最小节点
@@ -128,7 +148,7 @@ public class RBTree<T extends Comparable<T>> {
      *
      * @return 最小RBTNode
      */
-    public final RBTreeNode<T> getFristNode() {
+    private RBTreeNode<T> getFirstNode() {
         RBTreeNode<T> node = root;
         if (node != null) {
             while (node.left != null) {
@@ -139,13 +159,23 @@ public class RBTree<T extends Comparable<T>> {
     }
 
     /**
+     * 获取最大的key
+     *
+     * @return 最大key
+     */
+    public final T getLastKey() {
+        RBTreeNode<T> node = getLastNode();
+        return keyOf(node);
+    }
+
+    /**
      * 获取最大节点
      * <p>
      * 最右子树节点就是最大节点
      *
      * @return 最大RBTNode
      */
-    public final RBTreeNode<T> getLastNode() {
+    private RBTreeNode<T> getLastNode() {
         RBTreeNode<T> node = root;
         if (node != null) {
             while (node.right != null) {
@@ -289,7 +319,7 @@ public class RBTree<T extends Comparable<T>> {
      */
     public T searchRBTkey(T key) {
         RBTreeNode<T> node = getRBTNode(key);
-        return node == null ? null : node.key;
+        return keyOf(node);
     }
 
     /**
@@ -367,13 +397,13 @@ public class RBTree<T extends Comparable<T>> {
             parent.right = newNode;
         }
         // 节点插入后的调整
-        fixInsert(newNode);
-//        fixAfterInsert(newNode);
+//        fixInsert(newNode);
+        fixAfterInsert(newNode);
     }
 
     /**
      * RBTNode插入后的调整
-     * 这种写法易于理解，但是会存在大量的空指针问题
+     * 这种写法易于理解，但是会存在大量的空指针问题，操作的思想和文字说明，请看fixAfterInsert
      *
      * @param node RBTNode
      */
@@ -451,11 +481,18 @@ public class RBTree<T extends Comparable<T>> {
 
     /**
      * RBTNode插入后的调整
+     * <p>
+     * 插入节点的核心思想：新增的红节点，如果违反了红红不相邻，就要找兄弟树，往兄弟树转移。
+     * 兄弟树如果是黑的，就把红节点转移到兄弟树。
+     * 兄弟如果也是红的，就把红节点往上（祖父）移动，继续找兄弟树，直到兄弟树为黑树。
+     * 如果找到根节点还没找到，就把根节点变黑，树的高度+1。
+     * <p>
+     * 类比2-3-4树来说
      * 2-3-4树中结点添加需要遵守以下规则：
      * <p>
      * 插入都是向最下面一层插入；
      * 升元：将插入结点由 2-结点升级成 3-结点，或由 3-结点升级成 4-结点；
-     * 向 4-结点插入元素后，需要将中间元素提到父结点升元，原结点变成两个 2-结点，再把元素插入 2-结点中，如果父结点也是 4-结点，则递归向上层升元，至到根结点后将树高加1；
+     * 向 4-结点插入元素后，需要将中间元素提到父结点升元，原结点变成两个 2-结点，再把元素插入 2-结点中，如果父结点也是 4-结点，则递归向上层升元，至到根结点后将树高+1；
      * 而将这些规则对应到红黑树里，就是：
      * <p>
      * 新插入的结点颜色为红色，这样才可能不会对红黑树的高度产生影响。
@@ -544,6 +581,12 @@ public class RBTree<T extends Comparable<T>> {
     /**
      * 红黑树的删除
      * <p>
+     * 删除的核心思想：
+     * 主要说一下黑节点被删除，替换节点也是黑节点的情况，首先不能破坏黑色高度，也不能造成红红相邻
+     * 平衡方式就是从兄弟树中“借”红色节点（一般就是兄弟节点和兄弟的直接孩子节点）过来，填充为黑色节点。如果兄弟树没有红色节点，就把黑色节点上移（父亲节点），继续找兄弟节点的红色节点。
+     * 如果一直找到了根节点还是找不到可以借的红色节点，就抛弃这个黑色节点，整棵树高度-1。
+     *
+     * <p>
      * 红黑树的删除要比插入要复杂一些，我们还是类比 2-3-4树来讲：
      * <p>
      * 查找最近的叶子结点中的元素替代被删除元素，删除替代元素后，从替代元素所处叶子结点开始处理；
@@ -579,7 +622,7 @@ public class RBTree<T extends Comparable<T>> {
             // 删除节点指针指向node的后继节点
             node = successorNode;
         }
-        // 此时node只有0个或者一个孩子节点，左孩子或者右孩子来取代node的位置
+        // 此时node只有0个或者1个孩子节点，左孩子或者右孩子来取代node的位置
         RBTreeNode<T> replaceNode = (node.left != null ? node.left : node.right);
 
         if (replaceNode != null) {
@@ -616,7 +659,7 @@ public class RBTree<T extends Comparable<T>> {
             parent = node.parent;
             // node父指针移除
             node.parent = null;
-            if (parent != null){
+            if (parent != null) {
                 if (node == parent.left) {
                     parent.left = null;
                 } else {
@@ -633,7 +676,7 @@ public class RBTree<T extends Comparable<T>> {
      * <p>
      * 兄弟结点的子结点中有红色结点（兄弟结点对应 3-结点或 4-结点）能够“借用”，旋转过来后修正颜色，这时候兄弟节点一定是黑色的；
      * 父结点是红色结点（父结点对应 3-结点或 4-结点，可以降元）时，将父结点变黑色，自身和兄弟结点变红色后删除；
-     * 父结点和兄弟结点都是黑色时，将子树降一层后把父结点当作替代结点递归向上处理。
+     * 父结点和兄弟结点都是黑色时，将子树降一层后把父结点当作替代结点递归向上处理。对应case2的情况
      * 安全写法
      *
      * @param node RBTNode
@@ -647,16 +690,24 @@ public class RBTree<T extends Comparable<T>> {
                 RBTreeNode<T> brother = rightOf(parentOf(node));
                 // case1 ：兄弟是红色节点
                 if (colorOf(brother) == RED) {
+                    // 这个时候直接把兄弟节点借过来了，但是又要保持兄弟树的黑色高度稳定
+                    // 就交换父节点和兄弟节点的颜色（兄弟是红，父节点肯定是黑色了），把父节点借过来了
                     setColor(brother, BLACK);// 兄弟节点变黑
                     setColor(parentOf(node), RED);// 父节点变红
                     rotateLeft(parentOf(node));// 父节点左旋
-                    // 这个时候兄弟节点肯定是黑色了，因为之前的兄弟节点是红色的，那么他的子节点肯定是黑色的
                     brother = rightOf(parentOf(node));// 重新获取兄弟节点
+                    // 这个时候兄弟节点肯定是黑色了，因为之前的兄弟节点是红色的，那么他的子节点肯定是黑色的
+                    // 这时候不是简单把转过来的父节点变红就可以了，因为node是x-1(x表示原高度)，而兄弟节点（红色）转过来的孩子树的高度还是x（画图理解）
+                    // 所以本身高度就不统一，所以要进入接下来的case2；(case3或case4)
                 }
                 // case2 : 兄弟节点是黑色，并且两个孩子也是黑色
+                // 如果兄弟节点是黑色，那么node节点高度是x-1，兄弟节点孩子节点的高度也是x-1了（因为要去掉黑色兄弟节点）
                 if (colorOf(leftOf(brother)) == BLACK && colorOf(rightOf(brother)) == BLACK) {
-                    setColor(brother, RED);// 兄弟节点变成红色
+                    // 兄弟子树高度-1，往根节点递归处理，和插入不同的是，这里是到父节点，不是祖父
+                    setColor(brother, RED);// 兄弟节点变成红色，兄弟子树高度-1
                     node = parentOf(node);// 关注节点变成父节点
+                    // 这时候如果node节点（原父节点）是红色了，就跳出循环了，再把node节点（原父节点）变黑，兄弟子树高度+1，原来自己子树高度也+1
+                    // 新node（原父节点）是黑色，需要继续循环
                 } else {
                     // case3 : 兄弟节点是黑色；兄弟节点的左孩子是红色，右孩子是黑色的
                     if (colorOf(rightOf(brother)) == BLACK) {
@@ -664,15 +715,19 @@ public class RBTree<T extends Comparable<T>> {
                         setColor(brother, RED);// 兄弟变红
                         rotateRight(brother);// 兄弟节点右旋
                         brother = rightOf(parentOf(node));// 重新获取兄弟节点
+                        // 要把红节点转过去，就要先右旋，在左旋，为了保证旋转后还是红黑树，就要交换一下兄弟左孩子和兄弟节点的颜色了
                     }
                     // case4 : 兄弟节点是黑色；兄弟节点的右孩子是红色的，x的兄弟节点的左孩子任意颜色
                     setColor(brother, colorOf(parentOf(node)));// 父节点的颜色，赋值给兄弟节点
-                    setColor(parentOf(node), BLACK);// 父节点设置为黑色
-                    setColor(rightOf(brother), BLACK);// 兄弟孩子的右节点设置为黑色
-                    rotateLeft(parentOf(node));
+                    setColor(parentOf(node), BLACK);// 父节点设置为黑色，准备通过旋转把这个黑色节点借过来
+                    // 为什么染黑兄弟的右孩子，个人认为，真正左旋过去的，是兄弟节点的黑色，兄弟节点本身的高度-1。
+                    // 为了维持这个高度平衡，就把兄弟右孩子变成黑色，因为左旋后，右孩子的位置，就是原来兄弟节点位置，黑色高度恢复（+1-1抵消）
+                    setColor(rightOf(brother), BLACK);// 兄弟孩子的右节点设置为黑色，
+                    rotateLeft(parentOf(node));// 父节点左旋，这个时候就把节点借过来了，而且染黑了
+                    // 这一步后，删除调整已经结束，根节点依旧要保持黑色的属性，把node执行root，与之前的情况合并处理
                     node = root;
                 }
-            }else { // symmetric
+            } else { // symmetric，对称方同理，这里就不写了
                 // 获取兄弟节点
                 RBTreeNode<T> brother = leftOf(parentOf(node));
                 // case1 ：兄弟是红色节点
@@ -704,7 +759,7 @@ public class RBTree<T extends Comparable<T>> {
                 }
             }
         }
-
+        // 节点设置为黑色，兼容node两种颜色的情况
         setColor(node, BLACK);// 节点变黑
     }
 }
