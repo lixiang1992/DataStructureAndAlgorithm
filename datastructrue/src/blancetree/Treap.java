@@ -10,8 +10,8 @@ public class Treap {
     private static class TreeNode {
         long value;
         int priority;
-        int count;
-        int size;// 以他为root的子树总节点个数
+        int count;// 这个节点的数量
+        int size;// 以它为root的子树总节点个数
         TreeNode left;
         TreeNode right;
 
