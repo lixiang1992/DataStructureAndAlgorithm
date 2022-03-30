@@ -3,14 +3,15 @@ package blancetree;
 import java.util.Random;
 
 /**
- * 树堆，
+ * 树堆，满足平衡树的性质，还带上了rank的查询
  */
 public class Treap {
+    // 树节点
     private static class TreeNode {
         long value;
         int priority;
         int count;
-        int size;
+        int size;// 以他为root的子树总节点个数
         TreeNode left;
         TreeNode right;
 
@@ -163,13 +164,54 @@ public class Treap {
         return new int[]{Integer.MIN_VALUE, Integer.MAX_VALUE};
     }
 
-    public void delete(int val) {
+    // 返回排名为k的元素(从小到大)
+    public long kth(int k) {
+        return kth(root, k);
+    }
+
+    private long kth(TreeNode root, int k) {
+        if (root == null) {
+            return Long.MAX_VALUE;
+        }
+        int leftRank = root.left == null ? 0 : root.left.size;
+        int curRank = leftRank + root.count;
+        if (k <= leftRank) {
+            return kth(root.left, k);
+        } else if (k <= curRank) {
+            return root.value;
+        } else {
+            return kth(root.right, k - curRank);
+        }
+    }
+
+    // 返回排名为k的元素(从大到小)
+    public long reverseKth(int k) {
+        return reverseKth(root, k);
+    }
+
+    public long reverseKth(TreeNode root, int k) {
+        if (root == null) {
+            return Long.MIN_VALUE;
+        }
+        int rightRank = root.right == null ? 0 : root.right.size;
+        int curRank = rightRank + root.count;
+        if (k <= rightRank) {
+            return reverseKth(root.right, k);
+        } else if (k <= curRank) {
+            return root.value;
+        } else {
+            return reverseKth(root.left, k - curRank);
+        }
+    }
+
+    public void delete(long val) {
         root = delete(root, val);
     }
 
-    private TreeNode delete(TreeNode root, int value) {
-        if (root == null)
+    private TreeNode delete(TreeNode root, long value) {
+        if (root == null) {
             return null;
+        }
         if (root.value > value) {
             root.left = delete(root.left, value);
         } else if (root.value < value) {
@@ -182,6 +224,7 @@ public class Treap {
             }
             if (root.left == null || root.right == null) {
                 root.size--;
+                root.count--;
                 return root.left == null ? root.right : root.left;
             } else if (root.left.priority > root.right.priority) {
                 root = root.rightRotate();
@@ -212,4 +255,3 @@ public class Treap {
         }
     }
 }
-
