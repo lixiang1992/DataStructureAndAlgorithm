@@ -82,7 +82,7 @@ public class Treap {
         return root;
     }
 
-    // 第一个小于等于x的数
+    // 第一个小于等于x的数(从小打大排序)
     public long floor(long x) {
         long ret = Long.MIN_VALUE;
         TreeNode node = root;
