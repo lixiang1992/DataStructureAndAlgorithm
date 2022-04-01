@@ -5,27 +5,27 @@ import java.util.Random;
 /**
  * 树堆，满足平衡树的性质，还带上了rank的查询
  */
-public class Treap {
-    // 树节点
-    private static class TreeNode {
-        long value;
+public class Treap<T extends Comparable<T>> {
+
+    private static class TreeNode<T> {
+        T value;
         int priority;
         int count;// 这个节点的数量
-        int size;// 以它为root的子树总节点个数
-        TreeNode left;
-        TreeNode right;
+        int size;// 以他为root的子树总节点个数
+        TreeNode<T> left;
+        TreeNode<T> right;
 
-        TreeNode(long value, int priority) {
+        TreeNode(T value, int priority) {
             this.value = value;
             this.priority = priority;
             this.count = 1;
             this.size = 1;
         }
 
-        TreeNode leftRotate() {
+        TreeNode<T> leftRotate() {
             int preSize = size;
             int curSize = (left == null ? 0 : left.size) + (right.left == null ? 0 : right.left.size) + count;
-            TreeNode root = right;
+            TreeNode<T> root = right;
             right = root.left;
             root.left = this;
             this.size = curSize;
@@ -33,19 +33,20 @@ public class Treap {
             return root;
         }
 
-        TreeNode rightRotate() {
+        TreeNode<T> rightRotate() {
             int preSize = size;
             int curSize = (right == null ? 0 : right.size) + (left.right == null ? 0 : left.right.size) + count;
-            TreeNode root = left;
+            TreeNode<T> root = left;
             left = root.right;
             root.right = this;
             this.size = curSize;
             root.size = preSize;
             return root;
         }
+
     }
 
-    private TreeNode root;
+    private TreeNode<T> root;
 
     private final Random random;
 
@@ -57,21 +58,44 @@ public class Treap {
         return root == null ? 0 : root.size;
     }
 
-    public void insert(long x) {
+    public T getFirst() {
+        TreeNode<T> node = root;
+        if (node == null) {
+            return null;
+        }
+        while (node.left != null) {
+            node = node.left;
+        }
+        return node.value;
+    }
+
+    public T getLast() {
+        TreeNode<T> node = root;
+        if (node == null) {
+            return null;
+        }
+        while (node.right != null) {
+            node = node.right;
+        }
+        return node.value;
+    }
+
+    public void insert(T x) {
         root = insert(root, x);
     }
 
-    private TreeNode insert(TreeNode root, long x) {
+    private TreeNode<T> insert(TreeNode<T> root, T x) {
         if (root == null) {
-            return new TreeNode(x, random.nextInt());
+            return new TreeNode<>(x, random.nextInt());
         }
         root.size++;
-        if (x < root.value) {
+        int cmp = x.compareTo(root.value);
+        if (cmp < 0) {
             root.left = insert(root.left, x);
             if (root.left.priority > root.priority) {
                 root = root.rightRotate();
             }
-        } else if (x > root.value) {
+        } else if (cmp > 0) {
             root.right = insert(root.right, x);
             if (root.right.priority > root.priority) {
                 root = root.leftRotate();
@@ -82,14 +106,15 @@ public class Treap {
         return root;
     }
 
-    // 第一个小于等于x的数(从小打大排序)
-    public long floor(long x) {
-        long ret = Long.MIN_VALUE;
-        TreeNode node = root;
+    // 第一个小于等于x的数
+    public T floor(T x) {
+        T ret = null;
+        TreeNode<T> node = root;
         while (node != null) {
-            if (node.value == x) {
+            int cmp = x.compareTo(node.value);
+            if (cmp == 0) {
                 return x;
-            } else if (node.value > x) {
+            } else if (cmp < 0) {
                 node = node.left;
             } else {
                 ret = node.value;
@@ -100,11 +125,12 @@ public class Treap {
     }
 
     //第一个小于x的数(从小到大排序)
-    public long lower(long x) {
-        long ret = Long.MIN_VALUE;
-        TreeNode node = root;
+    public T lower(T x) {
+        T ret = null;
+        TreeNode<T> node = root;
         while (node != null) {
-            if (node.value < x) {
+            int cmp = x.compareTo(node.value);
+            if (cmp > 0) {
                 ret = node.value;
                 node = node.right;
             } else {
@@ -115,13 +141,14 @@ public class Treap {
     }
 
     // 第一个大于等于x的数(从小到大排序)
-    public long ceiling(long x) {
-        long ret = Long.MAX_VALUE;
-        TreeNode node = root;
+    public T ceiling(T x) {
+        T ret = null;
+        TreeNode<T> node = root;
         while (node != null) {
+            int cmp = x.compareTo(node.value);
             if (node.value == x) {
                 return x;
-            } else if (node.value > x) {
+            } else if (cmp < 0) {
                 ret = node.value;
                 node = node.left;
             } else {
@@ -132,11 +159,12 @@ public class Treap {
     }
 
     // 第一个大于x的数(从小到大排序)
-    public long higher(long x) {
-        long ret = Long.MAX_VALUE;
-        TreeNode node = root;
+    public T higher(T x) {
+        T ret = null;
+        TreeNode<T> node = root;
         while (node != null) {
-            if (node.value > x) {
+            int cmp = x.compareTo(node.value);
+            if (cmp < 0) {
                 ret = node.value;
                 node = node.left;
             } else {
@@ -147,15 +175,16 @@ public class Treap {
     }
 
     // 返回x的排名，从1开始。返回数组ret，ret[0]表示第一个x的rank，ret[1]表示最后一个x的rank。
-    public int[] rank(long x) {
-        TreeNode node = root;
+    public int[] rank(T x) {
+        TreeNode<T> node = root;
         int ans = 0;
         while (node != null) {
-            if (node.value > x) {
+            int cmp = x.compareTo(node.value);
+            if (cmp < 0) {
                 node = node.left;
             } else {
                 ans += (node.left == null ? 0 : node.left.size) + node.count;
-                if (x == node.value) {
+                if (cmp == 0) {
                     return new int[]{ans - node.count + 1, ans};
                 }
                 node = node.right;
@@ -165,13 +194,13 @@ public class Treap {
     }
 
     // 返回排名为k的元素(从小到大)
-    public long kth(int k) {
+    public T kth(int k) {
         return kth(root, k);
     }
 
-    private long kth(TreeNode root, int k) {
+    private T kth(TreeNode<T> root, int k) {
         if (root == null) {
-            return Long.MAX_VALUE;
+            return null;
         }
         int leftRank = root.left == null ? 0 : root.left.size;
         int curRank = leftRank + root.count;
@@ -185,13 +214,13 @@ public class Treap {
     }
 
     // 返回排名为k的元素(从大到小)
-    public long reverseKth(int k) {
+    public T reverseKth(int k) {
         return reverseKth(root, k);
     }
 
-    public long reverseKth(TreeNode root, int k) {
+    private T reverseKth(TreeNode<T> root, int k) {
         if (root == null) {
-            return Long.MIN_VALUE;
+            return null;
         }
         int rightRank = root.right == null ? 0 : root.right.size;
         int curRank = rightRank + root.count;
@@ -204,17 +233,18 @@ public class Treap {
         }
     }
 
-    public void delete(long val) {
+    public void delete(T val) {
         root = delete(root, val);
     }
 
-    private TreeNode delete(TreeNode root, long value) {
+    private TreeNode<T> delete(TreeNode<T> root, T value) {
         if (root == null) {
             return null;
         }
-        if (root.value > value) {
+        int cmp = value.compareTo(root.value);
+        if (cmp < 0) {
             root.left = delete(root.left, value);
-        } else if (root.value < value) {
+        } else if (cmp > 0) {
             root.right = delete(root.right, value);
         } else {
             if (root.count > 1) {
@@ -238,17 +268,18 @@ public class Treap {
         return root;
     }
 
-    public boolean contains(long value) {
+    public boolean contains(T value) {
         return contains(root, value);
     }
 
-    private boolean contains(TreeNode root, long value) {
+    private boolean contains(TreeNode<T> root, T value) {
         if (root == null) {
             return false;
         }
-        if (root.value == value) {
+        int cmp = value.compareTo(root.value);
+        if (cmp == 0) {
             return true;
-        } else if (root.value > value) {
+        } else if (cmp < 0) {
             return contains(root.left, value);
         } else {
             return contains(root.right, value);
