@@ -60,6 +60,66 @@ public class AvlTree<T extends Comparable<T>> {
         return node == null ? null : node.value;
     }
 
+    public T lower(T x) {
+        T res = null;
+        TreeNode<T> node = root;
+        while (node != null) {
+            int cmp = x.compareTo(node.value);
+            if(cmp <= 0) {
+                node = node.left;
+            } else {
+                res = node.value;
+                node = node.right;
+            }
+        }
+        return res;
+    }
+
+    public T floor(T x) {
+        T res = null;
+        TreeNode<T> node = root;
+        while (node != null) {
+            int cmp = x.compareTo(node.value);
+            if(cmp < 0) {
+                node = node.left;
+            } else {
+                res = node.value;
+                node = node.right;
+            }
+        }
+        return res;
+    }
+
+    public T higher(T x) {
+        T res = null;
+        TreeNode<T> node = root;
+        while (node != null) {
+            int cmp = x.compareTo(node.value);
+            if(cmp >= 0) {
+                node = node.right;
+            } else {
+                res = node.value;
+                node = node.left;
+            }
+        }
+        return res;
+    }
+
+    public T ceiling(T x) {
+        T res = null;
+        TreeNode<T> node = root;
+        while (node != null) {
+            int cmp = x.compareTo(node.value);
+            if(cmp > 0) {
+                node = node.right;
+            } else {
+                res = node.value;
+                node = node.left;
+            }
+        }
+        return res;
+    }
+
     public void insert(T x) {
         root = insert(root,x);
     }
@@ -159,7 +219,7 @@ public class AvlTree<T extends Comparable<T>> {
 
     private TreeNode<T> leftRotate(TreeNode<T> node) {
         int preSize = node.size;
-        int curSize = (node.left == null ? 0 : node.left.size) + (node.right.left == null ? 0 : node.right.left.size) + node.count;
+        int curSize = getSize(node.left) + getSize(node.right.left) + node.count;
         TreeNode<T> root = node.right;
         node.right = root.left;
         root.left = node;
@@ -172,7 +232,7 @@ public class AvlTree<T extends Comparable<T>> {
 
     private TreeNode<T> rightRotate(TreeNode<T> node) {
         int preSize = node.size;
-        int curSize = (node.right == null ? 0 : node.right.size) + (node.left.right == null ? 0 : node.left.right.size) + node.count;
+        int curSize = getSize(node.right) + getSize(node.left.right) + node.count;
         TreeNode<T> root = node.left;
         node.left = root.right;
         root.right = node;
@@ -187,6 +247,15 @@ public class AvlTree<T extends Comparable<T>> {
         if(node != null) {
             while(node.left != null) {
                 node = node.left;
+            }
+        }
+        return node;
+    }
+
+    private TreeNode<T> findMax(TreeNode<T> node) {
+        if(node != null) {
+            while(node.right != null) {
+                node = node.right;
             }
         }
         return node;
