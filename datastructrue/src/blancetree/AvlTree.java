@@ -80,6 +80,9 @@ public class AvlTree<T extends Comparable<T>> {
         TreeNode<T> node = root;
         while (node != null) {
             int cmp = x.compareTo(node.value);
+            if(cmp == 0) {
+                return x;
+            }
             if(cmp < 0) {
                 node = node.left;
             } else {
@@ -110,6 +113,9 @@ public class AvlTree<T extends Comparable<T>> {
         TreeNode<T> node = root;
         while (node != null) {
             int cmp = x.compareTo(node.value);
+            if(cmp == 0) {
+                return x;
+            }
             if(cmp > 0) {
                 node = node.right;
             } else {
