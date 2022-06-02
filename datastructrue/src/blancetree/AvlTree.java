@@ -223,6 +223,26 @@ public class AvlTree<T extends Comparable<T>> {
         return null;
     }
 
+    // 返回排名为k的元素(从小到大)
+    public T kth(int k) {
+        return kth(root, k);
+    }
+
+    private T kth(TreeNode<T> root, int k) {
+        if (root == null) {
+            return null;
+        }
+        int leftRank = root.left == null ? 0 : root.left.size;
+        int curRank = leftRank + root.count;
+        if (k <= leftRank) {
+            return kth(root.left, k);
+        } else if (k <= curRank) {
+            return root.value;
+        } else {
+            return kth(root.right, k - curRank);
+        }
+    }
+
     private TreeNode<T> leftRotate(TreeNode<T> node) {
         int preSize = node.size;
         int curSize = getSize(node.left) + getSize(node.right.left) + node.count;
