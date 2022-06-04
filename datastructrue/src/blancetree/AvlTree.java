@@ -40,7 +40,7 @@ public class AvlTree<T extends Comparable<T>> {
         return getSize(root);
     }
 
-    public T getFirst() {
+    public T first() {
         TreeNode<T> node = root;
         if(node != null) {
             while(node.left != null) {
@@ -50,7 +50,7 @@ public class AvlTree<T extends Comparable<T>> {
         return node == null ? null : node.value;
     }
 
-    public T getLast() {
+    public T last() {
         TreeNode<T> node = root;
         if(node != null) {
             while(node.right != null) {
@@ -213,7 +213,7 @@ public class AvlTree<T extends Comparable<T>> {
             if (cmp < 0) {
                 node = node.left;
             } else {
-                ans += (node.left == null ? 0 : node.left.size) + node.count;
+                ans += (getSize(node.left)) + node.count;
                 if (cmp == 0) {
                     return new int[]{ans - node.count + 1, ans};
                 }
