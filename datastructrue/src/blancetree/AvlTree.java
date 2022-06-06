@@ -182,7 +182,7 @@ public class AvlTree<T extends Comparable<T>> {
                 root.right = delete(root.right,root.value);
             }
         }
-        root.size = (root.left == null ? 0 : root.left.size) + (root.right == null ? 0 : root.right.size) + root.count;
+        root.size = getSize(root.left) + getSize(root.right) + root.count;
         return balance(root);
     }
 
