@@ -36,6 +36,10 @@ public class AvlTree<T extends Comparable<T>> {
         return node == null ? 0 : node.size;
     }
 
+    public void clear() {
+        root = null;
+    }
+
     public int getSize(){
         return getSize(root);
     }
@@ -213,14 +217,14 @@ public class AvlTree<T extends Comparable<T>> {
             if (cmp < 0) {
                 node = node.left;
             } else {
-                ans += (getSize(node.left)) + node.count;
+                ans += getSize(node.left) + node.count;
                 if (cmp == 0) {
                     return new int[]{ans - node.count + 1, ans};
                 }
                 node = node.right;
             }
         }
-        return null;
+        return new int[]{-1,-1};
     }
 
     // 返回排名为k的元素(从小到大)
