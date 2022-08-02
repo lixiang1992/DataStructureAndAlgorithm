@@ -40,6 +40,10 @@ public class AvlTree<T extends Comparable<T>> {
         root = null;
     }
 
+    public boolean isEmpty() {
+        return getSize() == 0;
+    }
+
     public int getSize(){
         return getSize(root);
     }
@@ -271,6 +275,25 @@ public class AvlTree<T extends Comparable<T>> {
         node.height = Math.max(height(node.left),height(node.right)) + 1;
         root.height = Math.max(height(root.left),height(node)) + 1;
         return root;
+    }
+
+    public boolean contains(T value) {
+        if (root == null) {
+            return false;
+        }
+        TreeNode<T> node = root;
+        int cmp;
+        while(node != null) {
+            cmp = value.compareTo(node.value);
+            if(cmp == 0) {
+                return true;
+            } else if(cmp < 0) {
+                node = node.left;
+            } else {
+                node = node.right;
+            }
+        }
+        return false;
     }
 
     private TreeNode<T> findMin(TreeNode<T> node) {
