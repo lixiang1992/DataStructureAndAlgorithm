@@ -240,7 +240,7 @@ public class AvlTree<T extends Comparable<T>> {
         if (root == null) {
             return null;
         }
-        int leftRank = root.left == null ? 0 : root.left.size;
+        int leftRank = getSize(root.left);
         int curRank = leftRank + root.count;
         if (k <= leftRank) {
             return kth(root.left, k);
@@ -248,6 +248,26 @@ public class AvlTree<T extends Comparable<T>> {
             return root.value;
         } else {
             return kth(root.right, k - curRank);
+        }
+    }
+
+    // 返回排名为k的元素(从大到小)
+    public T reverseKth(int k) {
+        return reverseKth(root, k);
+    }
+
+    private T reverseKth(TreeNode<T> root, int k) {
+        if (root == null) {
+            return null;
+        }
+        int rightRank = getSize(root.right);
+        int curRank = rightRank + root.count;
+        if (k <= rightRank) {
+            return reverseKth(root.right, k);
+        } else if (k <= curRank) {
+            return root.value;
+        } else {
+            return reverseKth(root.left, k - curRank);
         }
     }
 
