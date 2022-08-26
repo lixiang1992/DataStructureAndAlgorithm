@@ -21,10 +21,14 @@ public class AvlTree<T extends Comparable<T>> {
         TreeNode<T> right;
 
         public TreeNode(T value) {
+            this(value,1);
+        }
+
+        public TreeNode(T value,int cnt) {
             this.value = value;
             this.height = 0;
-            this.size = 1;
-            this.count = 1;
+            this.size = cnt;
+            this.count = cnt;
         }
     }
 
@@ -135,47 +139,55 @@ public class AvlTree<T extends Comparable<T>> {
     }
 
     public void insert(T x) {
-        root = insert(root,x);
+        insert(x,1);
     }
 
-    private TreeNode<T> insert(TreeNode<T> root,T x) {
+    public void insert(T x,int cnt) {
+        root = insert(root,x,cnt);
+    }
+
+    private TreeNode<T> insert(TreeNode<T> root,T x,int cnt) {
         if(root == null) {
-            return new TreeNode<>(x);
+            return new TreeNode<>(x,cnt);
         }
-        root.size++;
+        root.size += cnt;
         int cmp = x.compareTo(root.value);
         if(cmp < 0) {
-            root.left = insert(root.left,x);
+            root.left = insert(root.left,x,cnt);
         } else if(cmp > 0) {
-            root.right = insert(root.right,x);
+            root.right = insert(root.right,x,cnt);
         } else {
-            root.count++;
+            root.count += cnt;
         }
         return balance(root);
     }
 
     public void delete(T x) {
-        root = delete(root,x);
+        delete(x,1);
     }
 
-    private TreeNode<T> delete(TreeNode<T> root,T x) {
+    public void delete(T x,int cnt) {
+        root = delete(root,x,cnt);
+    }
+
+    private TreeNode<T> delete(TreeNode<T> root,T x,int cnt) {
         if(root == null) {
             return null;
         }
         int cmp = x.compareTo(root.value);
         if(cmp < 0) {
-            root.left = delete(root.left,x);
+            root.left = delete(root.left,x,cnt);
         } else if(cmp > 0){
-            root.right = delete(root.right,x);
+            root.right = delete(root.right,x,cnt);
         } else {
-            if(root.count > 1) {
-                root.size--;
-                root.count--;
+            if(root.count > cnt) {
+                root.size -= cnt;
+                root.count -= cnt;
                 return root;
             }
             if(root.left == null || root.right == null) {
-                root.size--;
-                root.count--;
+                root.size = 0;
+                root.count = 0;
                 root = root.left == null ? root.right : root.left;
                 return balance(root);
             } else {
@@ -184,10 +196,10 @@ public class AvlTree<T extends Comparable<T>> {
                 // 属性替换
                 root.value = rightMin.value;
                 root.count = rightMin.count;
-                // 后继节点变为1个
-                rightMin.count = 1;
+                // 后继节点变为cnt个
+                rightMin.count = cnt;
                 // 去删除后继
-                root.right = delete(root.right,root.value);
+                root.right = delete(root.right,root.value,cnt);
             }
         }
         root.size = getSize(root.left) + getSize(root.right) + root.count;
