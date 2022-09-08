@@ -58,7 +58,7 @@ public class Treap<T extends Comparable<T>> {
         return root == null ? 0 : root.size;
     }
 
-    public T getFirst() {
+    public T first() {
         TreeNode<T> node = root;
         if (node == null) {
             return null;
@@ -69,7 +69,7 @@ public class Treap<T extends Comparable<T>> {
         return node.value;
     }
 
-    public T getLast() {
+    public T last() {
         TreeNode<T> node = root;
         if (node == null) {
             return null;
@@ -190,7 +190,7 @@ public class Treap<T extends Comparable<T>> {
                 node = node.right;
             }
         }
-        return new int[]{Integer.MIN_VALUE, Integer.MAX_VALUE};
+        return new int[]{0,0};
     }
 
     // 返回排名为k的元素(从小到大)
