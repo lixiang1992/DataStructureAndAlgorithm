@@ -14,8 +14,8 @@ public class AvlTree<T extends Comparable<T>> {
         T value;
         int height;
 
-        int count;
-        int size;
+        long count;
+        long size;
 
         TreeNode<T> left;
         TreeNode<T> right;
@@ -24,7 +24,7 @@ public class AvlTree<T extends Comparable<T>> {
             this(value,1);
         }
 
-        public TreeNode(T value,int cnt) {
+        public TreeNode(T value,long cnt) {
             this.value = value;
             this.height = 0;
             this.size = cnt;
@@ -36,7 +36,7 @@ public class AvlTree<T extends Comparable<T>> {
         return node == null ? -1 : node.height;
     }
 
-    private int getSize(TreeNode<T> node) {
+    private long getSize(TreeNode<T> node) {
         return node == null ? 0 : node.size;
     }
 
@@ -45,10 +45,10 @@ public class AvlTree<T extends Comparable<T>> {
     }
 
     public boolean isEmpty() {
-        return getSize() == 0;
+        return getSize() == 0L;
     }
 
-    public int getSize(){
+    public long getSize(){
         return getSize(root);
     }
 
@@ -142,11 +142,11 @@ public class AvlTree<T extends Comparable<T>> {
         insert(x,1);
     }
 
-    public void insert(T x,int cnt) {
+    public void insert(T x,long cnt) {
         root = insert(root,x,cnt);
     }
 
-    private TreeNode<T> insert(TreeNode<T> root,T x,int cnt) {
+    private TreeNode<T> insert(TreeNode<T> root,T x,long cnt) {
         if(root == null) {
             return new TreeNode<>(x,cnt);
         }
@@ -225,9 +225,9 @@ public class AvlTree<T extends Comparable<T>> {
         return root;
     }
 
-    public int[] rank(T x) {
+    public long[] rank(T x) {
         TreeNode<T> node = root;
-        int ans = 0;
+        long ans = 0L;
         while (node != null) {
             int cmp = x.compareTo(node.value);
             if (cmp < 0) {
@@ -235,25 +235,25 @@ public class AvlTree<T extends Comparable<T>> {
             } else {
                 ans += getSize(node.left) + node.count;
                 if (cmp == 0) {
-                    return new int[]{ans - node.count + 1, ans};
+                    return new long[]{ans - node.count + 1, ans};
                 }
                 node = node.right;
             }
         }
-        return new int[]{-1,-1};
+        return new long[]{-1L,-1L};
     }
 
     // 返回排名为k的元素(从小到大)
-    public T kth(int k) {
+    public T kth(long k) {
         return kth(root, k);
     }
 
-    private T kth(TreeNode<T> root, int k) {
+    private T kth(TreeNode<T> root, long k) {
         if (root == null) {
             return null;
         }
-        int leftRank = getSize(root.left);
-        int curRank = leftRank + root.count;
+        long leftRank = getSize(root.left);
+        long curRank = leftRank + root.count;
         if (k <= leftRank) {
             return kth(root.left, k);
         } else if (k <= curRank) {
@@ -264,16 +264,16 @@ public class AvlTree<T extends Comparable<T>> {
     }
 
     // 返回排名为k的元素(从大到小)
-    public T reverseKth(int k) {
+    public T reverseKth(long k) {
         return reverseKth(root, k);
     }
 
-    private T reverseKth(TreeNode<T> root, int k) {
+    private T reverseKth(TreeNode<T> root, long k) {
         if (root == null) {
             return null;
         }
-        int rightRank = getSize(root.right);
-        int curRank = rightRank + root.count;
+        long rightRank = getSize(root.right);
+        long curRank = rightRank + root.count;
         if (k <= rightRank) {
             return reverseKth(root.right, k);
         } else if (k <= curRank) {
@@ -284,8 +284,8 @@ public class AvlTree<T extends Comparable<T>> {
     }
 
     private TreeNode<T> leftRotate(TreeNode<T> node) {
-        int preSize = node.size;
-        int curSize = getSize(node.left) + getSize(node.right.left) + node.count;
+        long preSize = node.size;
+        long curSize = getSize(node.left) + getSize(node.right.left) + node.count;
         TreeNode<T> root = node.right;
         node.right = root.left;
         root.left = node;
@@ -297,8 +297,8 @@ public class AvlTree<T extends Comparable<T>> {
     }
 
     private TreeNode<T> rightRotate(TreeNode<T> node) {
-        int preSize = node.size;
-        int curSize = getSize(node.right) + getSize(node.left.right) + node.count;
+        long preSize = node.size;
+        long curSize = getSize(node.right) + getSize(node.left.right) + node.count;
         TreeNode<T> root = node.left;
         node.left = root.right;
         root.right = node;
