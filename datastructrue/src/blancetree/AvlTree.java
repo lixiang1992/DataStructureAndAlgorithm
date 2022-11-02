@@ -166,11 +166,11 @@ public class AvlTree<T extends Comparable<T>> {
         delete(x,1);
     }
 
-    public void delete(T x,int cnt) {
+    public void delete(T x,long cnt) {
         root = delete(root,x,cnt);
     }
 
-    private TreeNode<T> delete(TreeNode<T> root,T x,int cnt) {
+    private TreeNode<T> delete(TreeNode<T> root,T x,long cnt) {
         if(root == null) {
             return null;
         }
