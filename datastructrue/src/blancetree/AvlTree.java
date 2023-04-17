@@ -62,6 +62,14 @@ public class AvlTree<T extends Comparable<T>> {
         return node == null ? null : node.value;
     }
 
+    public T pollFirst() {
+        T first = first();
+        if(first != null) {
+            delete(first);
+        }
+        return first;
+    }
+
     public T last() {
         TreeNode<T> node = root;
         if(node != null) {
@@ -70,6 +78,14 @@ public class AvlTree<T extends Comparable<T>> {
             }
         }
         return node == null ? null : node.value;
+    }
+
+    public T pollLast() {
+        T last = last();
+        if(last != null) {
+            delete(last);
+        }
+        return last;
     }
 
     public T lower(T x) {
